@@ -25,32 +25,33 @@ async function fetchVehicles() {
 
 function knapsack(items, capacity) {
     const W = Math.floor(Number(capacity) || 0);
-    const n = items.length;
-    if (n === 0 || W <= 0) return { selected: [], totalDuration: 0, totalImpact: 0 };
+    if (W <= 0 || items.length === 0) return { selected: [], totalDuration: 0, totalImpact: 0 };
 
-    const dp = Array.from({ length: n + 1 }, () => new Array(W + 1).fill(0));
+    const dp = new Array(W + 1).fill(0);
+    const pick = new Array(W + 1).fill(-1);
 
-    for (let i = 1; i <= n; i++) {
-        const item = items[i - 1];
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
         const wt = Math.floor(Number(item.Duration) || 0);
         const val = Number(item.Impact) || 0;
-        for (let w = 0; w <= W; w++) {
-            if (wt <= w) {
-                dp[i][w] = Math.max(dp[i - 1][w], dp[i - 1][w - wt] + val);
-            } else {
-                dp[i][w] = dp[i - 1][w];
+        if (wt <= 0 || wt > W) continue;
+
+        for (let w = W; w >= wt; w--) {
+            const candidate = dp[w - wt] + val;
+            if (candidate > dp[w]) {
+                dp[w] = candidate;
+                pick[w] = i;
             }
         }
     }
 
-    const selected = [];
+    // reconstruct chosen items
     let w = W;
-    for (let i = n; i > 0 && w > 0; i--) {
-        if (dp[i][w] !== dp[i - 1][w]) {
-            const item = items[i - 1];
-            selected.push(item);
-            w -= Math.floor(Number(item.Duration) || 0);
-        }
+    const selected = [];
+    while (w > 0 && pick[w] !== -1) {
+        const item = items[pick[w]];
+        selected.push(item);
+        w -= Math.floor(Number(item.Duration) || 0);
     }
 
     const totalDuration = selected.reduce((sum, item) => sum + Number(item.Duration || 0), 0);
@@ -60,8 +61,6 @@ function knapsack(items, capacity) {
 }
 
 async function runScheduler() {
-    console.log('Starting scheduler...');
-
     const depots = await fetchDepots();
     const vehicles = await fetchVehicles();
 
@@ -82,7 +81,6 @@ async function runScheduler() {
 
     const results = {};
     for (const depot of depots) {
-        console.log(`Solving depot ${depot.ID} with ${depot.MechanicHours} hours`);
         const items = (vehiclesByDepot[depot.ID] || []).filter(item => Number(item.Duration) > 0);
         const result = knapsack(items, depot.MechanicHours);
         results[depot.ID] = {
@@ -95,7 +93,6 @@ async function runScheduler() {
     }
 
     const output = { runAt: new Date().toISOString(), results };
-    console.log('Scheduler finished.');
     console.log(JSON.stringify(output, null, 2));
     return output;
 }
