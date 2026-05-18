@@ -1,0 +1,29 @@
+{
+  "name": "interview",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u00002\u00003\u0000C\u0000S\u0000R\u00002\u00002\u00008\u0000\r\u0000 \u0000",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tharun-Kumar-228/23CSR228.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Tharun-Kumar-228/23CSR228/issues"
+  },
+  "homepage": "https://github.com/Tharun-Kumar-228/23CSR228#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
